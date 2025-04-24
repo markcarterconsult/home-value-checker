@@ -1,5 +1,5 @@
 import streamlit as st
-import openai
+from openai import OpenAI
 import requests
 
 # --- Static ZIP Code → Price per Square Foot Mapping ---
@@ -14,8 +14,7 @@ zip_price_map = {
 
 # --- Optional API override placeholder ---
 def fetch_psf_from_api(zip_code):
-    # Placeholder for ATTOM, Redfin, or Realtor.com API integration
-    # Simulate failure for now
+    # Placeholder for Redfin, ATTOM, etc.
     return None
 
 def get_price_per_sqft(zip_code):
@@ -33,7 +32,7 @@ st.set_page_config(page_title="Home Value Estimator", layout="centered")
 st.title("🏡 Instant Home Value Estimator")
 st.write("Enter your property details below to get an AI-powered home value estimate.")
 
-# --- Lead Capture Form ---
+# --- Form ---
 with st.form("lead_form"):
     name = st.text_input("Full Name")
     email = st.text_input("Email")
@@ -51,7 +50,6 @@ if submitted:
     value_estimate = int(psf * sqft)
     price_range = f"${value_estimate - 15000:,} – ${value_estimate + 15000:,}"
 
-    # --- GPT Prompt for AI summary ---
     prompt = f"""
 You are a home valuation expert.
 
@@ -67,19 +65,19 @@ Price per Square Foot Used: ${psf}
 Estimated Home Value Range: {price_range}
 """
 
-    openai.api_key = st.secrets["OPENAI_API_KEY"]
-    response = openai.ChatCompletion.create(
+    # Use OpenAI v1 format
+    client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+    response = client.chat.completions.create(
         model="gpt-4",
         messages=[{"role": "user", "content": prompt}],
         temperature=0.7
     )
-
     result = response.choices[0].message.content
 
     st.success("✅ Your Home Value Estimate:")
     st.markdown(result)
 
-    # --- Optional: Send to Webhook / CRM / Email ---
+    # Optional: Save or send the lead
     lead_data = {
         "name": name,
         "email": email,
@@ -94,5 +92,6 @@ Estimated Home Value Range: {price_range}
         "gpt_summary": result
     }
 
-    # requests.post("https://your-webhook-url.com", json=lead_data)  # Uncomment to send
+    # requests.post("https://your-webhook-url.com", json=lead_data)  # Uncomment to use
+
 
