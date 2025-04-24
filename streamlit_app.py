@@ -1,6 +1,7 @@
 import streamlit as st
 from openai import OpenAI
 import requests
+import re
 
 # --- Static ZIP Code → Price per Square Foot Mapping ---
 zip_price_map = {
@@ -12,7 +13,6 @@ zip_price_map = {
     "default": 185
 }
 
-# --- Optional API override placeholder ---
 def fetch_psf_from_api(zip_code):
     return None
 
@@ -26,12 +26,34 @@ def get_price_per_sqft(zip_code):
         pass
     return psf
 
-# --- Streamlit Page Setup ---
+def format_home_value_output(address, beds, baths, sqft, psf, price_range, result):
+    formatted = f"""
+### Home Value Estimate for {address}
+
+Your home - featuring **{beds} bedrooms**, **{baths} bathrooms**, and **{sqft:,} sqft** of interior space - is currently estimated to be worth between:
+
+### Estimated Range: **{price_range}**
+
+This estimate is based on a baseline price of **${psf} per square foot**.
+
+---
+
+### Recommendations to Increase Home Value
+"""
+    bullets = re.findall(r"\d+\.\s+(.*)", result)
+    if bullets:
+        for bullet in bullets:
+            formatted += f"- {bullet.strip()}\n"
+    else:
+        formatted += f"{result.strip()}\n"
+
+    formatted += "\n---\n\nNote: Market conditions vary. Consider consulting a licensed real estate professional before making major investment decisions.\n"
+    return formatted
+
 st.set_page_config(page_title="Home Value Estimator", layout="centered")
-st.title("🏡 Instant Home Value Estimator")
+st.title("Home Value Estimator")
 st.write("Enter your property details below to get an AI-powered home value estimate.")
 
-# --- Form ---
 with st.form("lead_form"):
     name = st.text_input("Full Name")
     email = st.text_input("Email")
@@ -50,7 +72,6 @@ with st.form("lead_form"):
     upgrades = st.text_area("Recent Renovations or Upgrades (optional)")
     submitted = st.form_submit_button("Get My Estimate")
 
-# --- On Submit ---
 if submitted:
     psf = get_price_per_sqft(zip_code)
     value_estimate = int(psf * sqft)
@@ -87,8 +108,9 @@ Estimated Home Value Range: {price_range}
     )
     result = response.choices[0].message.content
 
-    st.success("✅ Your Home Value Estimate:")
-    st.markdown(result)
+    st.success("Your Home Value Estimate:")
+    formatted_output = format_home_value_output(address, beds, baths, sqft, psf, price_range, result)
+    st.markdown(formatted_output)
 
     lead_data = {
         "name": name,
@@ -111,9 +133,5 @@ Estimated Home Value Range: {price_range}
         "gpt_summary": result
     }
 
-    # Optional: Send to a webhook
+    # Optional: Send to webhook
     # requests.post("https://your-webhook-url.com", json=lead_data)
-
-    # requests.post("https://your-webhook-url.com", json=lead_data)  # Uncomment to use
-
-
