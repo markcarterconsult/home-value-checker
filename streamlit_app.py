@@ -14,7 +14,6 @@ zip_price_map = {
 
 # --- Optional API override placeholder ---
 def fetch_psf_from_api(zip_code):
-    # Placeholder for Redfin, ATTOM, etc.
     return None
 
 def get_price_per_sqft(zip_code):
@@ -39,9 +38,16 @@ with st.form("lead_form"):
     phone = st.text_input("Phone Number")
     address = st.text_input("Property Address")
     zip_code = st.text_input("ZIP Code")
-    beds = st.number_input("Bedrooms", min_value=0, max_value=10, step=1)
-    baths = st.number_input("Bathrooms", min_value=0, max_value=10, step=1)
-    sqft = st.number_input("Square Footage", min_value=100)
+    beds = st.number_input("Bedrooms", min_value=0, max_value=10)
+    baths = st.number_input("Bathrooms", min_value=0, max_value=10)
+    sqft = st.number_input("Interior Square Footage", min_value=100)
+    lot_size = st.number_input("Lot Size (sqft)", min_value=0)
+    pool = st.selectbox("Pool?", ["No", "Yes"])
+    garage_type = st.selectbox("Garage Type", ["None", "Detached", "Attached"])
+    garage_capacity = st.selectbox("Garage Capacity", ["N/A", "1-car", "2-car", "3-car", "4+ cars"])
+    basement = st.selectbox("Basement", ["None", "Unfinished", "Finished"])
+    condition = st.selectbox("Overall Condition", ["Excellent", "Good", "Fair", "Needs Work"])
+    upgrades = st.text_area("Recent Renovations or Upgrades (optional)")
     submitted = st.form_submit_button("Get My Estimate")
 
 # --- On Submit ---
@@ -53,19 +59,26 @@ if submitted:
     prompt = f"""
 You are a home valuation expert.
 
-Use the following data to generate an AI-powered home value summary. Include the estimated price range and two personalized recommendations to increase the home's value.
+Use the following data to generate an AI-powered home value summary. Provide a realistic price range and personalized recommendations to increase the value of this home.
 
 Address: {address}
 ZIP Code: {zip_code}
 Bedrooms: {beds}
 Bathrooms: {baths}
-Square Footage: {sqft}
-Price per Square Foot Used: ${psf}
+Interior Square Footage: {sqft}
+Lot Size: {lot_size} sqft
+Has Pool: {pool}
+Garage Type: {garage_type}
+Garage Capacity: {garage_capacity}
+Basement: {basement}
+Overall Condition: {condition}
+Recent Upgrades: {upgrades}
+
+Use ${psf}/sqft as a baseline for price calculation.
 
 Estimated Home Value Range: {price_range}
 """
 
-    # Use OpenAI v1 format
     client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
     response = client.chat.completions.create(
         model="gpt-4",
@@ -77,7 +90,6 @@ Estimated Home Value Range: {price_range}
     st.success("✅ Your Home Value Estimate:")
     st.markdown(result)
 
-    # Optional: Save or send the lead
     lead_data = {
         "name": name,
         "email": email,
@@ -87,10 +99,20 @@ Estimated Home Value Range: {price_range}
         "beds": beds,
         "baths": baths,
         "sqft": sqft,
+        "lot_size": lot_size,
+        "pool": pool,
+        "garage_type": garage_type,
+        "garage_capacity": garage_capacity,
+        "basement": basement,
+        "condition": condition,
+        "upgrades": upgrades,
         "psf_used": psf,
         "price_range": price_range,
         "gpt_summary": result
     }
+
+    # Optional: Send to a webhook
+    # requests.post("https://your-webhook-url.com", json=lead_data)
 
     # requests.post("https://your-webhook-url.com", json=lead_data)  # Uncomment to use
 
