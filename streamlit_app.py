@@ -3,7 +3,6 @@ from openai import OpenAI
 import requests
 import re
 
-# --- Static ZIP Code → Price per Square Foot Mapping ---
 zip_price_map = {
     "63130": 195,
     "63141": 225,
@@ -26,10 +25,9 @@ def get_price_per_sqft(zip_code):
         pass
     return psf
 
-def format_home_value_output_html(address, beds, baths, sqft, psf, price_range, result):
+def build_html_summary(address, beds, baths, sqft, psf, price_range, result):
     bullets = re.findall(r"\d+\.\s+(.*)", result)
     html = f"""
-<div style='font-family: sans-serif; font-size: 18px; line-height: 1.6;'>
     <h3 style='margin-bottom: 0.5em;'>Home Value Estimate for {address.title()}</h3>
     <p>Your home – featuring <strong>{beds} bedrooms</strong>, <strong>{baths} bathrooms</strong>, and <strong>{sqft:,} sqft</strong> of interior space – is currently estimated to be worth between:</p>
     <h2 style='font-size: 26px; margin: 0.5em 0;'>${price_range}</h2>
@@ -43,18 +41,14 @@ def format_home_value_output_html(address, beds, baths, sqft, psf, price_range, 
             html += f"<li>{tip.strip()}</li>"
     else:
         html += f"<li>{result.strip()}</li>"
-
     html += """
     </ul>
-    <p style='margin-top: 2em; font-size: 14px; color: #666;'>
-    Note: Market conditions vary. Consider consulting a licensed real estate professional before making major investment decisions.
-    </p>
-</div>
-"""
+    <p style='margin-top: 2em; font-size: 14px; color: #666;'>Note: Market conditions vary. Consult a licensed real estate professional before starting major projects.</p>
+    """
     return html
 
 st.set_page_config(page_title="Home Value Estimator", layout="centered")
-st.title("Home Value Estimator")
+st.markdown("<h1 style='font-family: Helvetica, sans-serif;'>Home Value Estimator</h1>", unsafe_allow_html=True)
 st.write("Enter your property details below to get an AI-powered home value estimate.")
 
 with st.form("lead_form"):
@@ -111,6 +105,19 @@ Estimated Home Value Range: {price_range}
     )
     result = response.choices[0].message.content
 
-    st.success("Your Home Value Estimate:")
-    formatted_html = format_home_value_output_html(address, beds, baths, sqft, psf, price_range, result)
-    st.markdown(formatted_html, unsafe_allow_html=True)
+    summary_html = build_html_summary(address, beds, baths, sqft, psf, price_range, result)
+
+    st.markdown(f"""
+<div style='
+    font-family: "Helvetica Neue", Helvetica, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    padding: 1.5em;
+    background-color: #f8fff4;
+    border-left: 5px solid #4CAF50;
+    border-radius: 6px;
+'>
+    <h2 style='margin-top: 0;'>Your Home Value Estimate</h2>
+    {summary_html}
+</div>
+""", unsafe_allow_html=True)
