@@ -26,29 +26,32 @@ def get_price_per_sqft(zip_code):
         pass
     return psf
 
-def format_home_value_output(address, beds, baths, sqft, psf, price_range, result):
-    formatted = f"""
-### Home Value Estimate for {address}
-
-Your home - featuring **{beds} bedrooms**, **{baths} bathrooms**, and **{sqft:,} sqft** of interior space - is currently estimated to be worth between:
-
-### Estimated Range: **{price_range}**
-
-This estimate is based on a baseline price of **${psf} per square foot**.
-
----
-
-### Recommendations to Increase Home Value
-"""
+def format_home_value_output_html(address, beds, baths, sqft, psf, price_range, result):
     bullets = re.findall(r"\d+\.\s+(.*)", result)
+    html = f"""
+<div style='font-family: sans-serif; font-size: 18px; line-height: 1.6;'>
+    <h3 style='margin-bottom: 0.5em;'>Home Value Estimate for {address.title()}</h3>
+    <p>Your home – featuring <strong>{beds} bedrooms</strong>, <strong>{baths} bathrooms</strong>, and <strong>{sqft:,} sqft</strong> of interior space – is currently estimated to be worth between:</p>
+    <h2 style='font-size: 26px; margin: 0.5em 0;'>${price_range}</h2>
+    <p>This estimate is based on a baseline price of <strong>${psf} per square foot</strong>.</p>
+    <hr style='margin: 1.5em 0;' />
+    <h4 style='margin-top: 1em;'>Recommendations to Increase Home Value</h4>
+    <ul>
+"""
     if bullets:
-        for bullet in bullets:
-            formatted += f"- {bullet.strip()}\n"
+        for tip in bullets:
+            html += f"<li>{tip.strip()}</li>"
     else:
-        formatted += f"{result.strip()}\n"
+        html += f"<li>{result.strip()}</li>"
 
-    formatted += "\n---\n\nNote: Market conditions vary. Consider consulting a licensed real estate professional before making major investment decisions.\n"
-    return formatted
+    html += """
+    </ul>
+    <p style='margin-top: 2em; font-size: 14px; color: #666;'>
+    Note: Market conditions vary. Consider consulting a licensed real estate professional before making major investment decisions.
+    </p>
+</div>
+"""
+    return html
 
 st.set_page_config(page_title="Home Value Estimator", layout="centered")
 st.title("Home Value Estimator")
@@ -109,29 +112,5 @@ Estimated Home Value Range: {price_range}
     result = response.choices[0].message.content
 
     st.success("Your Home Value Estimate:")
-    formatted_output = format_home_value_output(address, beds, baths, sqft, psf, price_range, result)
-    st.markdown(formatted_output)
-
-    lead_data = {
-        "name": name,
-        "email": email,
-        "phone": phone,
-        "address": address,
-        "zip_code": zip_code,
-        "beds": beds,
-        "baths": baths,
-        "sqft": sqft,
-        "lot_size": lot_size,
-        "pool": pool,
-        "garage_type": garage_type,
-        "garage_capacity": garage_capacity,
-        "basement": basement,
-        "condition": condition,
-        "upgrades": upgrades,
-        "psf_used": psf,
-        "price_range": price_range,
-        "gpt_summary": result
-    }
-
-    # Optional: Send to webhook
-    # requests.post("https://your-webhook-url.com", json=lead_data)
+    formatted_html = format_home_value_output_html(address, beds, baths, sqft, psf, price_range, result)
+    st.markdown(formatted_html, unsafe_allow_html=True)
