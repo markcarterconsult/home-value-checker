@@ -5,11 +5,11 @@ import re
 
 st.set_page_config(page_title="Home Value Estimator", layout="centered")
 
+# Use system font stack (no @import or Google Fonts)
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 html, body, div, p, span, h1, h2, h3, h4, h5, h6, li, ul {
-    font-family: 'Poppins', sans-serif !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     font-size: 18px;
     line-height: 1.6;
 }
@@ -121,7 +121,6 @@ Estimated Home Value Range: {price_range}
 
     st.markdown(f'''
 <div style='
-    font-family: "Poppins", sans-serif;
     font-size: 18px;
     line-height: 1.6;
     padding: 1.5em;
