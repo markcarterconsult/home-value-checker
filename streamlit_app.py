@@ -135,7 +135,3 @@ Estimated Home Value Range: {price_range}
     {summary_html}
 </div>
 """, unsafe_allow_html=True)
-    <h2 style='margin-top: 0;'>Your Home Value Estimate</h2>
-    {summary_html}
-</div>
-""", unsafe_allow_html=True)
