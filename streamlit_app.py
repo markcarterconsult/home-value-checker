@@ -5,6 +5,7 @@ import re
 
 st.set_page_config(page_title="Home Value Estimator", layout="centered")
 
+# ✅ Use system UI font stack
 st.markdown("""
 <style>
 html, body, div, p, span, h1, h2, h3, h4, h5, h6, li, ul {
@@ -118,8 +119,7 @@ Estimated Home Value Range: {price_range}
 
     summary_html = build_html_summary(address, beds, baths, sqft, psf, price_range, result)
 
-    # Display with full style and HTML rendering
-    st.markdown(f'''
+    copy_html = f'''
 <div style='
     font-size: 18px;
     line-height: 1.6;
@@ -131,9 +131,8 @@ Estimated Home Value Range: {price_range}
     <h2 style='margin-top: 0;'>Your Home Value Estimate</h2>
     {summary_html}
 </div>
-''', unsafe_allow_html=True)
-
-    # Show raw HTML for copy
-    with st.expander("Copy HTML Code"):
-        st.code(summary_html, language='html')
-        st.button("Copy to Clipboard (Cmd+C / Ctrl+C)", help="Highlight and copy the HTML to use it elsewhere")
+'''
+    st.markdown(copy_html, unsafe_allow_html=True)
+    with st.expander("📋 Copy HTML Output"):
+        st.code(copy_html, language='html')
+        st.button("Copy to Clipboard (Cmd+C / Ctrl+C)")
