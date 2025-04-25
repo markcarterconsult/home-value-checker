@@ -1,8 +1,10 @@
-
 import streamlit as st
 from openai import OpenAI
 import requests
 import re
+
+# ✅ This must be the first Streamlit command
+st.set_page_config(page_title="Home Value Estimator", layout="centered")
 
 # Inject Google Font: Poppins
 st.markdown("""
@@ -17,7 +19,6 @@ html, body, div, p, span, h1, h2, h3, h4, h5, h6, li, ul {
 </style>
 """, unsafe_allow_html=True)
 
-# --- ZIP to PSF Map ---
 zip_price_map = {
     "63130": 195,
     "63141": 225,
@@ -62,7 +63,6 @@ def build_html_summary(address, beds, baths, sqft, psf, price_range, result):
     """
     return html
 
-st.set_page_config(page_title="Home Value Estimator", layout="centered")
 st.markdown("<h1>Home Value Estimator</h1>", unsafe_allow_html=True)
 st.write("Enter your property details below to get an AI-powered home value estimate.")
 
