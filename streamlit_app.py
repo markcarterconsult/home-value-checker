@@ -3,10 +3,8 @@ from openai import OpenAI
 import requests
 import re
 
-# ✅ This MUST be first
 st.set_page_config(page_title="Home Value Estimator", layout="centered")
 
-# ✅ Now safe to inject font
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
@@ -121,6 +119,7 @@ Estimated Home Value Range: {price_range}
 
     summary_html = build_html_summary(address, beds, baths, sqft, psf, price_range, result)
 
+    # ✅ Fix: Render HTML with unsafe_allow_html=True
     st.markdown(f"""
 <div style='
     font-family: "Poppins", sans-serif;
@@ -130,6 +129,11 @@ Estimated Home Value Range: {price_range}
     background-color: #f8fff4;
     border-left: 5px solid #4CAF50;
     border-radius: 6px;
+'>
+    <h2 style='margin-top: 0;'>Your Home Value Estimate</h2>
+    {summary_html}
+</div>
+""", unsafe_allow_html=True)
 '>
     <h2 style='margin-top: 0;'>Your Home Value Estimate</h2>
     {summary_html}
