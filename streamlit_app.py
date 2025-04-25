@@ -1,8 +1,23 @@
+
 import streamlit as st
 from openai import OpenAI
 import requests
 import re
 
+# Inject Google Font: Poppins
+st.markdown("""
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+html, body, div, p, span, h1, h2, h3, h4, h5, h6, li, ul {
+    font-family: 'Poppins', sans-serif !important;
+    font-size: 18px;
+    line-height: 1.6;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# --- ZIP to PSF Map ---
 zip_price_map = {
     "63130": 195,
     "63141": 225,
@@ -48,7 +63,7 @@ def build_html_summary(address, beds, baths, sqft, psf, price_range, result):
     return html
 
 st.set_page_config(page_title="Home Value Estimator", layout="centered")
-st.markdown("<h1 style='font-family: Helvetica, sans-serif;'>Home Value Estimator</h1>", unsafe_allow_html=True)
+st.markdown("<h1>Home Value Estimator</h1>", unsafe_allow_html=True)
 st.write("Enter your property details below to get an AI-powered home value estimate.")
 
 with st.form("lead_form"):
@@ -109,7 +124,7 @@ Estimated Home Value Range: {price_range}
 
     st.markdown(f"""
 <div style='
-    font-family: "Helvetica Neue", Helvetica, sans-serif;
+    font-family: "Poppins", sans-serif;
     font-size: 18px;
     line-height: 1.6;
     padding: 1.5em;
