@@ -40,7 +40,7 @@ def get_price_per_sqft(zip_code):
 
 def build_html_summary(address, beds, baths, sqft, psf, price_range, result):
     bullets = re.findall(r"\d+\.\s+(.*)", result)
-    html = f"""
+    html = f'''
     <h3 style='margin-bottom: 0.5em;'>Home Value Estimate for {address.title()}</h3>
     <p>Your home – featuring <strong>{beds} bedrooms</strong>, <strong>{baths} bathrooms</strong>, and <strong>{sqft:,} sqft</strong> of interior space – is currently estimated to be worth between:</p>
     <h2 style='font-size: 26px; margin: 0.5em 0;'>${price_range}</h2>
@@ -48,16 +48,16 @@ def build_html_summary(address, beds, baths, sqft, psf, price_range, result):
     <hr style='margin: 1.5em 0;' />
     <h4 style='margin-top: 1em;'>Recommendations to Increase Home Value</h4>
     <ul>
-"""
+    '''
     if bullets:
         for tip in bullets:
             html += f"<li>{tip.strip()}</li>"
     else:
         html += f"<li>{result.strip()}</li>"
-    html += """
+    html += '''
     </ul>
     <p style='margin-top: 2em; font-size: 14px; color: #666;'>Note: Market conditions vary. Consult a licensed real estate professional before starting major projects.</p>
-    """
+    '''
     return html
 
 st.markdown("<h1>Home Value Estimator</h1>", unsafe_allow_html=True)
@@ -86,7 +86,7 @@ if submitted:
     value_estimate = int(psf * sqft)
     price_range = f"${value_estimate - 15000:,} – ${value_estimate + 15000:,}"
 
-    prompt = f"""
+    prompt = f'''
 You are a home valuation expert.
 
 Use the following data to generate an AI-powered home value summary. Provide a realistic price range and personalized recommendations to increase the value of this home.
@@ -107,7 +107,7 @@ Recent Upgrades: {upgrades}
 Use ${psf}/sqft as a baseline for price calculation.
 
 Estimated Home Value Range: {price_range}
-"""
+'''
 
     client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
     response = client.chat.completions.create(
@@ -119,8 +119,7 @@ Estimated Home Value Range: {price_range}
 
     summary_html = build_html_summary(address, beds, baths, sqft, psf, price_range, result)
 
-    # ✅ Fix: Render HTML with unsafe_allow_html=True
-    st.markdown(f"""
+    st.markdown(f'''
 <div style='
     font-family: "Poppins", sans-serif;
     font-size: 18px;
@@ -133,9 +132,4 @@ Estimated Home Value Range: {price_range}
     <h2 style='margin-top: 0;'>Your Home Value Estimate</h2>
     {summary_html}
 </div>
-""", unsafe_allow_html=True)
-'>
-    <h2 style='margin-top: 0;'>Your Home Value Estimate</h2>
-    {summary_html}
-</div>
-""", unsafe_allow_html=True)
+''', unsafe_allow_html=True)
