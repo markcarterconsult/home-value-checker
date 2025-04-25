@@ -3,14 +3,13 @@ from openai import OpenAI
 import requests
 import re
 
-# ✅ This must be the first Streamlit command
+# ✅ This MUST be first
 st.set_page_config(page_title="Home Value Estimator", layout="centered")
 
-# Inject Google Font: Poppins
+# ✅ Now safe to inject font
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
-
 html, body, div, p, span, h1, h2, h3, h4, h5, h6, li, ul {
     font-family: 'Poppins', sans-serif !important;
     font-size: 18px;
@@ -132,6 +131,10 @@ Estimated Home Value Range: {price_range}
     border-left: 5px solid #4CAF50;
     border-radius: 6px;
 '>
+    <h2 style='margin-top: 0;'>Your Home Value Estimate</h2>
+    {summary_html}
+</div>
+""", unsafe_allow_html=True)
     <h2 style='margin-top: 0;'>Your Home Value Estimate</h2>
     {summary_html}
 </div>
