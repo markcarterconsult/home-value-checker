@@ -135,4 +135,9 @@ Estimated Home Value Range: {price_range}
     st.markdown(copy_html, unsafe_allow_html=True)
     with st.expander("📋 Copy HTML Output"):
         st.code(copy_html, language='html')
+        st.markdown('<button onclick="navigator.clipboard.writeText(`'+copy_html+'`)" style="margin-top: 10px; padding: 6px 12px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">📋 Copy to Clipboard</button>', unsafe_allow_html=True)
+        st.button("Copy to Clipboard (Cmd+C / Ctrl+C)")
+    st.markdown(copy_html, unsafe_allow_html=True)
+    with st.expander("📋 Copy HTML Output"):
+        st.code(copy_html, language='html')
         st.button("Copy to Clipboard (Cmd+C / Ctrl+C)")
